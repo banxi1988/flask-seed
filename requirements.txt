@@ -1,2 +1,5 @@
 Flask
 Flask-Principal
+Flask-Login
+requests
+Flask-Testing
