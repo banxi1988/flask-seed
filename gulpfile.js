@@ -11,7 +11,7 @@ var del = require('del');
 var mainBowerFiles = require('main-bower-files');
 var sass = require('gulp-sass');
 
-var output_dir = 'youjia_manager/static/v2'
+var output_dir = 'flask_seed/static'
 var paths = {
   scripts: ['src/coffee/**/*.coffee', '!src/external/**/*.coffee','!src/coffee/demo/**/*.coffee'],
   scripts_dest:output_dir+'/js',
@@ -20,7 +20,7 @@ var paths = {
   font_dest:output_dir+'/fonts',
   images: 'client/img/**/*',
   jade:'src/jade/**/*.jade',
-  jade_dest:output_dir+'/app'
+  jade_dest:output_dir
 };
 
 // not all tasks need to use streams
