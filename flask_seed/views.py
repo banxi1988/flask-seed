@@ -1,11 +1,15 @@
 #-*- coding:utf-8 -*-
-from flask import ( Response,request,redirect,url_for
+from flask import ( current_app, Response,request,redirect,url_for,abort,
+                   session,render_template
                    )
 from flask.ext.login import (
  login_user,logout_user,current_user,login_required
 )
+from flask.ext.principal import (
+            Identity,AnonymousIdentity,identity_changed
+)
 from flask_seed import app
-from .plugins import admin_permission
+from .plugins import admin_permission,EditPostPermission
 from .plugins import login_manager
 from .users import User
 
@@ -34,6 +38,9 @@ def login():
         ok,user = User.check_login(username,password)
         if ok:
             login_user(user)
+            # Tell Flask-Principal the identity changed
+            identity = Identity(user.id)
+            identity_changed.send(current_app._get_current_object(),identity=identity)
             redirect_url = request.args.get('next') or url_for('index')
         else:
             redirect_url = url_for('login')
@@ -44,6 +51,11 @@ def login():
 @login_required
 def logout():
     logout_user()
+    # Remove session key set by Flask-Principal
+    for key in ('identity.name','identity.auth_type'):
+        session.pop(key,None)
+    # Tell Flask-Principal the user is anonymous
+    identity_changed.send(current_app._get_current_object(), identity=AnonymousIdentity())
     return redirect(url_for('login'))
 
 @app.route('/')
@@ -67,4 +79,17 @@ def admin():
 def do_articles():
     with admin_permission.require():
         return Response('Only if you are admin')
+
+@app.route('/posts/<post_id>', methods=['PUT','PATCH'])
+def edit_post(post_id):
+    permission =  EditPostPermission(post_id)
+    if permission.can():
+        # Save the edits
+        return render_template('edit_post.html')
+    abort(403)
+
+
+
+
+
 
