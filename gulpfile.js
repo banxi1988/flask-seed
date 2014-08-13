@@ -10,6 +10,7 @@ var gulpFilter = require('gulp-filter');
 var del = require('del');
 var mainBowerFiles = require('main-bower-files');
 var sass = require('gulp-sass');
+var plumber = require('gulp-plumber');
 
 var output_dir = 'flask_seed/static'
 var paths = {
@@ -33,18 +34,14 @@ gulp.task('clean', function(cb) {
 gulp.task('jade',function(){
     var opts = {"pretty":true};
     return gulp.src(paths.jade)
+        .pipe(plumber())
         .pipe(jade(opts))
         .pipe(gulp.dest(paths.jade_dest))
-});
-gulp.task('jade-login',function(){
-    var opts = {"pretty":true};
-    return gulp.src('src/jade/admin/login.jade')
-        .pipe(jade(opts))
-        .pipe(gulp.dest(paths.jade_dest+'/admin'))
 });
 
 gulp.task('scss',function(){
     gulp.src(paths.scss)
+        .pipe(plumber())
         .pipe(sass())
         .pipe(gulp.dest(paths.css_dest))
 
@@ -55,13 +52,14 @@ gulp.task('scripts', function() {
   // with sourcemaps all the way down
     //  ignore uglify() 　 for develop
   return gulp.src(paths.scripts)
-    .pipe(sourcemaps.init())
-      .pipe(coffee())
-      .pipe(concat('app_v2.js'))
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest(paths.scripts_dest));
+        .pipe(plumber())
+        .pipe(sourcemaps.init())
+        .pipe(coffee())
+        .pipe(concat('app_v2.js'))
+        .pipe(sourcemaps.write())
+        .pipe(gulp.dest(paths.scripts_dest));
 });
-gulp.task('login',['jade-login','scripts','bower','scss'],function(){
+gulp.task('build',['jade','scripts','bower','scss'],function(){
     console.log("login task");
 
 });
@@ -101,4 +99,4 @@ gulp.task('watch', function() {
 });
 
 // The default task (called when you run `gulp` from cli)
-gulp.task('default', ['watch', 'login']);
+gulp.task('default', ['watch', 'build']);

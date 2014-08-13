@@ -3,3 +3,4 @@ Flask-Principal
 Flask-Login
 requests
 Flask-Testing
+Flask-Uploads

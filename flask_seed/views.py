@@ -1,6 +1,6 @@
 #-*- coding:utf-8 -*-
 from flask import ( current_app, Response,request,redirect,url_for,abort,
-                   session,render_template
+                   session,render_template,send_from_directory
                    )
 from flask.ext.login import (
  login_user,logout_user,current_user,login_required
@@ -89,7 +89,33 @@ def edit_post(post_id):
     abort(403)
 
 
+#### View for upload file
+def allowd_file(filename):
+    ALLOWED_EXTENSIONS = {'png','jpg','gif','jpeg'}
+    return '.' in filename and  filename.rsplit('.')[1] in ALLOWED_EXTENSIONS
 
 
+@app.route('/upload', methods=['GET','POST'])
+def upload_file():
+    import os.path
+    from werkzeug.utils import secure_filename
+    if request.method == 'POST':
+        file = request.files['upfile']
+        if file and allowd_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+            return redirect(url_for('uploaded_file',filename=filename))
+    return '''
+        <form action="" method="POST" enctype="multipart/form-data">
+            <p>
+                <input type="file" name="file" />
+                <input type="submit" value="Upload"/>
+            </p>
+        </form>
 
+    '''
+
+@app.route('/files/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'],filename)
 

@@ -25,6 +25,7 @@
     "gulp-imagemin": "^0.6.2",
     "gulp-jade": "^0.7.0",
     "gulp-jshint": "^1.8.4",
+    "gulp-plumber": "^0.6.4",
     "gulp-sass": "^0.7.2",
     "gulp-sourcemaps": "^1.1.0",
     "gulp-uglify": "^0.3.1",

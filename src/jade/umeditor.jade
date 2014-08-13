@@ -1,0 +1,14 @@
+doctype html
+html(lang='zh-cn')
+    head
+        meta(charset='utf-8')
+        title umeditor demo
+        link(rel="stylesheet", href="/static/umeditor/themes/default/css/umeditor.css")
+    body
+        script(id="container", name="content" type="text/plain")
+        script(type="text/javascript",src="/static/umeditor/third-party/jquery.min.js")
+        script(type="text/javascript",src="/static/umeditor/umeditor.config.js")
+        script(type="text/javascript",src="/static/umeditor/umeditor.js")
+        //- script(type="text/javascript",src="/static/umeditor/lang/zh-cn/zh-cn.js")
+        script(type="text/javascript").
+            var ue=UM.getEditor('container');
