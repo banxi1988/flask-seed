@@ -5,7 +5,9 @@ html(lang='zh-cn')
         title umeditor demo
         link(rel="stylesheet", href="/static/umeditor/themes/default/css/umeditor.css")
     body
-        script(id="container", name="content" type="text/plain")
+        form(action='/questions/', method='POST')
+            script(id="container", name="content" type="text/plain")
+            button.btn.btn-default(type='submit') Add Question
         script(type="text/javascript",src="/static/umeditor/third-party/jquery.min.js")
         script(type="text/javascript",src="/static/umeditor/umeditor.config.js")
         script(type="text/javascript",src="/static/umeditor/umeditor.js")

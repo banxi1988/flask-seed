@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <title>umeditor preview demo</title>
+    <link href="/static/css/bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/font-awesome.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/common.css" rel="stylesheet" type="text/css">
+    <!--link(rel="stylesheet", href="/static/umeditor/themes/default/css/umeditor.css")-->
+  </head>
+  <body ng-app="previewApp">
+    <div ng-controller="previewCtrl">
+      <div ng-bind-html="content" class="question-content"></div>
+    </div>
+    <script src="/static/js/vendor/jquery.js"></script>
+    <script src="/static/js/vendor/angular.js"></script>
+    <script src="/static/js/vendor/angular-route.js"></script>
+    <script src="/static/js/vendor/angular-resource.js"></script>
+    <script src="/static/js/vendor/angular-sanitize.js"></script>
+    <script src="/static/js/vendor/bootstrap.js"></script>
+    <script src="/static/js/vendor/ui-bootstrap-tpls.js"></script>
+    <script src="/static/js/app_v2.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      function queryParams(){
+           var url = window.location.href;
+           var queryString = url.split('?')[1];
+           var pairs = queryString.split('&')
+           var params= {}
+           for(var i =0; i<pairs.length;i++){
+               pair = pairs[i].split('=')
+               params[pair[0]] = pair[1];
+           }
+           return params;
+      }
+      var previewApp = angular.module('previewApp',['ngSanitize']);
+      previewApp.controller('previewCtrl',['$scope','$http',
+          function($scope,$http){
+              var params = queryParams();
+              var filename = params['question_file'];
+              $http.get('/questions/'+filename)
+                  .success(function(r){
+                   $scope.content=r.content
+              });
+          }
+      ]);
+    </script>
+  </body>
+</html>

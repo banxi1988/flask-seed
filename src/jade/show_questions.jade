@@ -1,0 +1,42 @@
+doctype html
+html(lang='zh-cn')
+    head
+        meta(charset='utf-8')
+        title umeditor preview demo
+        include common/global_css.jade
+        //link(rel="stylesheet", href="/static/umeditor/themes/default/css/umeditor.css")
+    body(ng-app='previewApp')
+        //-script(id="container", name="content" type="text/plain")
+        //-script(type="text/javascript",src="/static/umeditor/third-party/jquery.min.js")
+        //-script(type="text/javascript",src="/static/umeditor/umeditor.config.js")
+        //-script(type="text/javascript",src="/static/umeditor/umeditor.js")
+        //- script(type="text/javascript",src="/static/umeditor/lang/zh-cn/zh-cn.js")
+        div(ng-controller='previewCtrl')
+            .question-content(ng-bind-html='content')
+
+        include common/global_js.jade
+
+        script(type="text/javascript").
+            function queryParams(){
+                 var url = window.location.href;
+                 var queryString = url.split('?')[1];
+                 var pairs = queryString.split('&')
+                 var params= {}
+                 for(var i =0; i<pairs.length;i++){
+                     pair = pairs[i].split('=')
+                     params[pair[0]] = pair[1];
+                 }
+                 return params;
+            }
+            var previewApp = angular.module('previewApp',['ngSanitize']);
+            previewApp.controller('previewCtrl',['$scope','$http',
+                function($scope,$http){
+                    var params = queryParams();
+                    var filename = params['question_file'];
+                    $http.get('/questions/'+filename)
+                        .success(function(r){
+                         $scope.content=r.content
+                    });
+                }
+            ]);
+

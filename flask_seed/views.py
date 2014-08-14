@@ -1,6 +1,9 @@
 #-*- coding:utf-8 -*-
+import logging
+import os.path
+import codecs
 from flask import ( current_app, Response,request,redirect,url_for,abort,
-                   session,render_template,send_from_directory
+                   session,render_template,send_from_directory,jsonify
                    )
 from flask.ext.login import (
  login_user,logout_user,current_user,login_required
@@ -13,6 +16,7 @@ from .plugins import admin_permission,EditPostPermission
 from .plugins import login_manager
 from .users import User
 
+logger = logging.getLogger(__name__)
 login_manager.login_view = 'login'
 login_manager.login_message = u"请登录"
 
@@ -88,11 +92,21 @@ def edit_post(post_id):
         return render_template('edit_post.html')
     abort(403)
 
+ALLOWED_EXTENTIONS = {'png','jpg','gif','jpeg'}
+@app.route('/umeditor')
+def umeditor():
+    action = request.args.get('action')
+    if action == 'config':
+        return jsonify(
+            imageMaxSize=1*1024*1024,
+            imageAllwFiles=['.'+ext for ext in  ALLOWED_EXTENTIONS],
+        )
+    else:
+        logger.error('Unkonw action'+action)
 
 #### View for upload file
 def allowd_file(filename):
-    ALLOWED_EXTENSIONS = {'png','jpg','gif','jpeg'}
-    return '.' in filename and  filename.rsplit('.')[1] in ALLOWED_EXTENSIONS
+    return '.' in filename and  filename.rsplit('.')[1] in ALLOWED_EXTENTIONS
 
 
 @app.route('/upload', methods=['GET','POST'])
@@ -103,8 +117,12 @@ def upload_file():
         file = request.files['upfile']
         if file and allowd_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
-            return redirect(url_for('uploaded_file',filename=filename))
+            file.save(os.path.join(app.config['IMG_UPLOAD_FOLDER'],filename))
+            return jsonify(state='SUCCESS',
+                           url=url_for('uploaded_file',filename=filename),
+                           title=filename,
+                           original=file.filename
+                           )
     return '''
         <form action="" method="POST" enctype="multipart/form-data">
             <p>
@@ -117,5 +135,40 @@ def upload_file():
 
 @app.route('/files/<filename>')
 def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'],filename)
+    return send_from_directory(app.config['IMG_UPLOAD_FOLDER'],filename)
+
+@app.route('/questions/',methods=['POST'])
+def questions():
+    import time
+    import random
+    import json
+    import codecs
+    form = request.form
+    filename = time.strftime('%Y-%m-%d_%H_%M_%S') + str(random.randint(1,1000000))+'.json'
+    r = dict(
+        filename = filename,
+        content = form.get('content'),
+        timestamp = int(time.time())
+    )
+    content = json.dumps(r)
+    filepath = os.path.join(app.config['QUESTIONS_UPLOAD_FOLDER'],filename)
+    with codecs.open(filepath,'w',encoding='utf-8') as f:
+        f.write(content)
+    return redirect('/static/show_questions.html?question_file='+filename)
+
+@app.route('/show_question/<question_file>')
+def show_question(question_file):
+    filepath = os.path.join(app.config['QUESTIONS_UPLOAD_FOLDER'],question_file)
+    with codecs.open(filepath,'r',encoding='utf-8') as f:
+        content = f.read()
+    return content
+
+
+@app.route('/questions/<question_file>',methods=['GET','PUT'])
+def question(question_file):
+    if request.method == 'GET':
+        return send_from_directory(app.config['QUESTIONS_UPLOAD_FOLDER'],question_file)
+    else:
+        pass
+
 
