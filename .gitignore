@@ -59,3 +59,5 @@ bower_components/
 .idea
 *.sublime-project
 *.sublime-workspace
+# as a static www dir for debug or dev
+www/

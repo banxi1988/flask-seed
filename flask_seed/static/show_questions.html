@@ -9,6 +9,8 @@
     <!--link(rel="stylesheet", href="/static/umeditor/themes/default/css/umeditor.css")-->
   </head>
   <body ng-app="previewApp">
+    <script type="text/javascript" src="/static/umeditor/third-party/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/umeditor/umeditor.js"></script>
     <div ng-controller="previewCtrl">
       <div ng-bind-html="content" class="question-content"></div>
     </div>
@@ -33,13 +35,13 @@
            return params;
       }
       var previewApp = angular.module('previewApp',['ngSanitize']);
-      previewApp.controller('previewCtrl',['$scope','$http',
-          function($scope,$http){
+      previewApp.controller('previewCtrl',['$scope','$http','$sce',
+          function($scope,$http,$sce){
               var params = queryParams();
               var filename = params['question_file'];
               $http.get('/questions/'+filename)
                   .success(function(r){
-                   $scope.content=r.content
+                   $scope.content= $sce.trustAsHtml(r.content);
               });
           }
       ]);

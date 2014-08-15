@@ -65,7 +65,7 @@ def logout():
 @app.route('/')
 @login_required
 def index():
-    return Response("Only if you are an user")
+    return app.send_static_file('index.html')
 
 @app.route('/settings')
 @login_required
@@ -95,6 +95,9 @@ def edit_post(post_id):
 ALLOWED_EXTENTIONS = {'png','jpg','gif','jpeg'}
 @app.route('/umeditor')
 def umeditor():
+    '''
+    editor 需要这么一个接受请求的sever_url,但是umeditor没有
+    '''
     action = request.args.get('action')
     if action == 'config':
         return jsonify(
@@ -137,9 +140,12 @@ def upload_file():
 def uploaded_file(filename):
     return send_from_directory(app.config['IMG_UPLOAD_FOLDER'],filename)
 
-@app.route('/questions/',methods=['POST'])
+@app.route('/questions/',methods=['GET','POST'])
 def questions():
-    import time
+    if request.method == 'GET':
+        path = app.config['QUESTIONS_UPLOAD_FOLDER']
+        filenames = [fname for fname in os.listdir(path) if fname.endswith('.json')]
+        return jsonify(ok=True,question_files=filenames)
     import random
     import json
     import codecs

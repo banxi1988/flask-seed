@@ -7,9 +7,9 @@ html(lang='zh-cn')
         //link(rel="stylesheet", href="/static/umeditor/themes/default/css/umeditor.css")
     body(ng-app='previewApp')
         //-script(id="container", name="content" type="text/plain")
-        //-script(type="text/javascript",src="/static/umeditor/third-party/jquery.min.js")
+        script(type="text/javascript",src="/static/umeditor/third-party/jquery.min.js")
         //-script(type="text/javascript",src="/static/umeditor/umeditor.config.js")
-        //-script(type="text/javascript",src="/static/umeditor/umeditor.js")
+        script(type="text/javascript",src="/static/umeditor/umeditor.js")
         //- script(type="text/javascript",src="/static/umeditor/lang/zh-cn/zh-cn.js")
         div(ng-controller='previewCtrl')
             .question-content(ng-bind-html='content')
@@ -29,13 +29,13 @@ html(lang='zh-cn')
                  return params;
             }
             var previewApp = angular.module('previewApp',['ngSanitize']);
-            previewApp.controller('previewCtrl',['$scope','$http',
-                function($scope,$http){
+            previewApp.controller('previewCtrl',['$scope','$http','$sce',
+                function($scope,$http,$sce){
                     var params = queryParams();
                     var filename = params['question_file'];
                     $http.get('/questions/'+filename)
                         .success(function(r){
-                         $scope.content=r.content
+                         $scope.content= $sce.trustAsHtml(r.content);
                     });
                 }
             ]);
