@@ -7,6 +7,12 @@ html
     body(ng-app='seedApp')
         .header
             .container
-                
+                div(ng-controller='seedCtrl')
+                    ul
+                        li(ng-repeat='q in questions')
+                            a(href="/static/show_questions.html?question_file={{q}}") {{q}}
+                    a.btn.button.button-primary(href='/static/umeditor.html') 添加问题
+
+        include common/global_js.jade
         
         

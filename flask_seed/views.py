@@ -105,7 +105,7 @@ def umeditor():
             imageAllwFiles=['.'+ext for ext in  ALLOWED_EXTENTIONS],
         )
     else:
-        logger.error('Unkonw action'+action)
+        logger.error('Unkonw action'+str(action))
 
 #### View for upload file
 def allowd_file(filename):
@@ -146,6 +146,7 @@ def questions():
         path = app.config['QUESTIONS_UPLOAD_FOLDER']
         filenames = [fname for fname in os.listdir(path) if fname.endswith('.json')]
         return jsonify(ok=True,question_files=filenames)
+    import time
     import random
     import json
     import codecs
