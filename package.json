@@ -16,6 +16,7 @@
   "author": "banxi",
   "license": "ISC",
   "devDependencies": {
+    "avoscloud-sdk": "^0.4.1",
     "bower": "^1.3.8",
     "del": "^0.1.1",
     "gulp": "^3.8.7",
